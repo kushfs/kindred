@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Chat with {{ other_user.full_name }} — Kindred{% endblock %}
+
+{% block content %}
+<div class="chat-container">
+    <!-- Chat Header -->
+    <div class="chat-header">
+        <a href="{{ url_for('matches.matches') }}" class="chat-back">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <div class="chat-header-user">
+            {% if other_user.profile_image %}
+            <img src="{{ url_for('static', filename='uploads/' + other_user.profile_image) }}" 
+                 class="chat-avatar" alt="{{ other_user.full_name }}">
+            {% else %}
+            <div class="chat-avatar-placeholder">{{ other_user.full_name[0] if other_user.full_name else '?' }}</div>
+            {% endif %}
+            <div>
+                <h3 class="chat-partner-name">{{ other_user.full_name }}</h3>
+                <span class="chat-matched-label">✦ Kindred match</span>
+            </div>
+        </div>
+        <a href="{{ url_for('profile.view_profile', user_id=other_user.id) }}" class="chat-view-profile">
+            <i class="bi bi-person"></i>
+        </a>
+    </div>
+    
+    <!-- Messages Area -->
+    <div class="chat-messages" id="chatMessages">
+        {% if not messages %}
+        <div class="chat-empty">
+            <div class="chat-empty-icon">✦</div>
+            <p>You matched with {{ other_user.full_name }}.</p>
+            <p class="chat-empty-sub">This is the beginning of something real.</p>
+        </div>
+        {% endif %}
+        
+        {% for msg in messages %}
+        <div class="message-wrap {% if msg.sender_id == session.get('user_id') %}own{% else %}other{% endif %}">
+            {% if msg.sender_id != session.get('user_id') %}
+            {% if other_user.profile_image %}
+            <img src="{{ url_for('static', filename='uploads/' + other_user.profile_image) }}" 
+                 class="msg-avatar" alt="{{ other_user.full_name }}">
+            {% else %}
+            <div class="msg-avatar-placeholder">{{ other_user.full_name[0] if other_user.full_name else '?' }}</div>
+            {% endif %}
+            {% endif %}
+            <div class="message-bubble">
+                <div class="message-content">{{ msg.content }}</div>
+                <div class="message-time">
+                    {% if msg.created_at %}
+                        {% if msg.created_at is string %}
+                            {{ msg.created_at[11:16] }}
+                        {% else %}
+                            {{ msg.created_at.strftime('%I:%M %p') }}
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <!-- Message Input -->
+    <div class="chat-input-area">
+        <form id="chatForm" class="chat-form">
+            <div class="chat-input-wrap">
+                <textarea class="chat-input" id="messageInput" 
+                          placeholder="Type a thoughtful message..." 
+                          rows="1" maxlength="1000"></textarea>
+                <button type="submit" class="chat-send-btn" id="sendBtn">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const matchId = {{ match_id }};
+const currentUserId = {{ session.get('user_id') }};
+
+// Scroll to bottom
+function scrollToBottom() {
+    const msgs = document.getElementById('chatMessages');
+    msgs.scrollTop = msgs.scrollHeight;
+}
+scrollToBottom();
+
+// Auto-grow textarea
+const textarea = document.getElementById('messageInput');
+textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+
+// Send on Enter (Shift+Enter for newline)
+textarea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        document.getElementById('chatForm').dispatchEvent(new Event('submit'));
+    }
+});
+
+// Submit form
+document.getElementById('chatForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const content = textarea.value.trim();
+    if (!content) return;
+    
+    const btn = document.getElementById('sendBtn');
+    btn.disabled = true;
+    
+    try {
+        const formData = new FormData();
+        formData.append('content', content);
+        
+        const res = await apiFetch(`/chat/${matchId}/send`, {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        
+        if (data.success) {
+            textarea.value = '';
+            textarea.style.height = 'auto';
+            
+            // Append message to UI
+            const msgs = document.getElementById('chatMessages');
+            
+            // Remove empty state if present
+            const emptyEl = msgs.querySelector('.chat-empty');
+            if (emptyEl) emptyEl.remove();
+            
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            
+            const msgEl = document.createElement('div');
+            msgEl.className = 'message-wrap own';
+            msgEl.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-content">${escapeHtml(content)}</div>
+                    <div class="message-time">${timeStr}</div>
+                </div>
+            `;
+            msgs.appendChild(msgEl);
+            
+            // Animate in
+            msgEl.style.opacity = '0';
+            msgEl.style.transform = 'translateY(10px)';
+            requestAnimationFrame(() => {
+                msgEl.style.transition = 'all 0.3s ease';
+                msgEl.style.opacity = '1';
+                msgEl.style.transform = 'translateY(0)';
+            });
+            
+            scrollToBottom();
+        }
+    } catch(err) {
+        showToast('Failed to send. Try again.', 'error');
+    }
+    
+    btn.disabled = false;
+    textarea.focus();
+});
+
+</script>
+{% endblock %}

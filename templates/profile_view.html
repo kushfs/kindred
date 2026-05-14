@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+{% block title %}{{ profile_user.full_name }} — Kindred{% endblock %}
+
+{% block content %}
+<div class="profile-view-container">
+    
+    <!-- Back button -->
+    <a href="{{ url_for('discover.discover') }}" class="back-link">
+        <i class="bi bi-arrow-left"></i> Back to Discover
+    </a>
+    
+    <div class="profile-view-grid">
+        <!-- Left: Main profile card -->
+        <div class="profile-main-col">
+            
+            <!-- Hero section -->
+            <div class="profile-hero-card" data-aos="fade-up">
+                <div class="profile-hero-bg">
+                    {% if profile_user.profile_image %}
+                    <img src="{{ url_for('static', filename='uploads/' + profile_user.profile_image) }}" 
+                         class="profile-hero-img" alt="{{ profile_user.full_name }}">
+                    {% else %}
+                    <div class="profile-hero-placeholder">
+                        <span>{{ profile_user.full_name[0] if profile_user.full_name else '?' }}</span>
+                    </div>
+                    {% endif %}
+                    <div class="profile-hero-overlay"></div>
+                </div>
+                
+                <div class="profile-hero-info">
+                    <h1 class="profile-full-name">
+                        {{ profile_user.full_name }}
+                        {% if profile_user.age %}<span class="profile-age">, {{ profile_user.age }}</span>{% endif %}
+                    </h1>
+                    {% if profile_user.bio %}
+                    <p class="profile-bio-text">{{ profile_user.bio }}</p>
+                    {% endif %}
+                    
+                    {% if not is_own %}
+                    <div class="profile-actions">
+                        {% if matched %}
+                        <a href="{{ url_for('chat.chat', match_id=matched.id) }}" class="btn-profile-chat">
+                            <i class="bi bi-chat-heart"></i>
+                            Open conversation
+                        </a>
+                        {% elif liked %}
+                        <button class="btn-profile-liked" disabled>
+                            <i class="bi bi-heart-fill"></i>
+                            You liked this profile
+                        </button>
+                        {% else %}
+                        <button class="btn-profile-like" onclick="likeProfilePage({{ profile_user.id }}, this)"
+                                {% if remaining_likes == 0 %}disabled{% endif %}>
+                            <i class="bi bi-heart"></i>
+                            {% if remaining_likes == 0 %}No likes remaining{% else %}Like this profile{% endif %}
+                        </button>
+                        {% endif %}
+                        <div class="remaining-likes-hint">
+                            <i class="bi bi-heart"></i> {{ remaining_likes }} likes left today
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="profile-actions">
+                        <a href="{{ url_for('profile.edit_profile') }}" class="btn-profile-edit">
+                            <i class="bi bi-pencil"></i>
+                            Edit my profile
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Hobby Images -->
+            {% if hobby_images %}
+            <div class="profile-section" data-aos="fade-up">
+                <h3 class="section-label">
+                    <i class="bi bi-camera"></i>
+                    Life in photos
+                </h3>
+                <div class="hobby-photo-grid">
+                    {% for img in hobby_images %}
+                    <div class="hobby-photo-item">
+                        <img src="{{ url_for('static', filename='uploads/' + img.image_path) }}" 
+                             alt="{{ img.hobby_name }}" loading="lazy">
+                        <div class="hobby-photo-label">{{ img.hobby_name }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Right: Info panels -->
+        <div class="profile-side-col">
+            
+            <!-- Hobbies -->
+            {% if hobbies %}
+            <div class="info-panel" data-aos="fade-left" data-aos-delay="100">
+                <h4 class="info-panel-title">
+                    <i class="bi bi-lightning"></i>
+                    Passions
+                </h4>
+                <div class="hobby-tags">
+                    {% for h in hobbies %}
+                    <span class="hobby-tag-pill">{{ h.hobby_name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Music -->
+            {% if profile_user.music_taste or profile_user.favorite_artists %}
+            <div class="info-panel" data-aos="fade-left" data-aos-delay="150">
+                <h4 class="info-panel-title">
+                    <i class="bi bi-music-note-beamed"></i>
+                    Musical world
+                </h4>
+                {% if profile_user.music_taste %}
+                <p class="info-text">{{ profile_user.music_taste }}</p>
+                {% endif %}
+                {% if profile_user.favorite_artists %}
+                <div class="info-tags">
+                    {% for artist in profile_user.favorite_artists.split(',')[:5] %}
+                    <span class="info-tag">{{ artist.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            <!-- Cinema -->
+            {% if profile_user.movie_taste or profile_user.favorite_movies %}
+            <div class="info-panel" data-aos="fade-left" data-aos-delay="200">
+                <h4 class="info-panel-title">
+                    <i class="bi bi-camera-reels"></i>
+                    Cinematic taste
+                </h4>
+                {% if profile_user.movie_taste %}
+                <p class="info-text">{{ profile_user.movie_taste }}</p>
+                {% endif %}
+                {% if profile_user.favorite_movies %}
+                <div class="info-tags">
+                    {% for movie in profile_user.favorite_movies.split(',')[:5] %}
+                    <span class="info-tag">{{ movie.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endif %}
+            
+            {% if not is_own %}
+            <!-- Report link -->
+            <div class="report-section" data-aos="fade-left" data-aos-delay="300">
+                <button class="report-btn" onclick="document.getElementById('reportModal').classList.add('active')">
+                    <i class="bi bi-flag"></i>
+                    Report this profile
+                </button>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+{% if not is_own %}
+<div class="modal-overlay" id="reportModal">
+    <div class="kindred-modal">
+        <h3>Report profile</h3>
+        <p>Your safety matters. Tell us what's wrong.</p>
+        <form method="POST" action="/report/{{ profile_user.id }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <select name="reason" class="kindred-select" required>
+                <option value="">Select a reason...</option>
+                <option>Fake profile or impersonation</option>
+                <option>Inappropriate content</option>
+                <option>Harassment or spam</option>
+                <option>Misleading information</option>
+            </select>
+            <textarea name="details" class="kindred-textarea mt-2" rows="3" placeholder="Any additional details..."></textarea>
+            <div class="modal-actions">
+                <button type="button" onclick="document.getElementById('reportModal').classList.remove('active')" class="btn-kindred-ghost">Cancel</button>
+                <button type="submit" class="btn-kindred-primary">Submit report</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}{% endblock %}

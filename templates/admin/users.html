@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Users — Admin — Kindred{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <div>
+            <h1 class="admin-title">
+                <i class="bi bi-people"></i>
+                User Management
+            </h1>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn-kindred-ghost">← Dashboard</a>
+    </div>
+    
+    <!-- Search -->
+    <form method="GET" class="admin-search-form" data-aos="fade-up">
+        <div class="input-wrapper">
+            <i class="bi bi-search input-icon"></i>
+            <input type="text" name="search" class="kindred-input" 
+                   placeholder="Search by name, username or email..."
+                   value="{{ search }}">
+        </div>
+        <button type="submit" class="btn-kindred-primary">Search</button>
+        {% if search %}<a href="{{ url_for('admin.users') }}" class="btn-kindred-ghost">Clear</a>{% endif %}
+    </form>
+    
+    <div class="admin-panel" data-aos="fade-up">
+        <div class="admin-table-wrap">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Email</th>
+                        <th>Age/Gender</th>
+                        <th>Profile</th>
+                        <th>Status</th>
+                        <th>Joined</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>
+                            <div class="admin-user-cell">
+                                {% if user.profile_image %}
+                                <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" class="admin-user-img">
+                                {% else %}
+                                <div class="admin-user-placeholder">{{ (user.full_name or user.username)[0] }}</div>
+                                {% endif %}
+                                <div>
+                                    <div>{{ user.full_name or '—' }}</div>
+                                    <small class="admin-username">@{{ user.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="admin-email">{{ user.email }}</td>
+                        <td>{{ user.age or '—' }} / {{ user.gender or '—' }}</td>
+                        <td>
+                            <span class="admin-badge {% if user.is_profile_complete %}badge-active{% else %}badge-inactive{% endif %}">
+                                {% if user.is_profile_complete %}Complete{% else %}Incomplete{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="admin-badge {% if user.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                                {% if user.is_active %}Active{% else %}Suspended{% endif %}
+                            </span>
+                        </td>
+                        <td class="admin-date">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '' }}</td>
+                        <td>
+                            <div class="admin-action-btns">
+                                <a href="{{ url_for('profile.view_profile', user_id=user.id) }}" 
+                                   class="admin-btn-sm btn-view" target="_blank">View</a>
+                                <form method="POST" action="{{ url_for('admin.toggle_user', user_id=user.id) }}" class="d-inline">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="admin-btn-sm {% if user.is_active %}btn-dismiss{% else %}btn-activate{% endif %}">
+                                        {% if user.is_active %}Suspend{% else %}Activate{% endif %}
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('admin.delete_user', user_id=user.id) }}" class="d-inline"
+                                      onsubmit="return confirm('Permanently delete this user?')">
+                                    <button type="submit" class="admin-btn-sm btn-ban">Delete</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not users %}
+                    <tr>
+                        <td colspan="7" class="admin-empty text-center">No users found.</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

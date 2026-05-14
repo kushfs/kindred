@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — Kindred{% endblock %}
+
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h1 class="admin-title">
+            <i class="bi bi-shield-check"></i>
+            Admin Dashboard
+        </h1>
+        <p class="admin-subtitle">Kindred platform overview</p>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="admin-stats-grid" data-aos="fade-up">
+        <div class="admin-stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #7c3aed, #a78bfa)">
+                <i class="bi bi-people-fill"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{ stats.total_users }}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #059669, #6ee7b7)">
+                <i class="bi bi-person-check-fill"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{ stats.active_users }}</div>
+                <div class="stat-label">Active Users</div>
+            </div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ec4899, #f9a8d4)">
+                <i class="bi bi-heart-fill"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{ stats.total_matches }}</div>
+                <div class="stat-label">Matches Made</div>
+            </div>
+        </div>
+        <div class="admin-stat-card">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #fcd34d)">
+                <i class="bi bi-chat-fill"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{ stats.total_messages }}</div>
+                <div class="stat-label">Messages Sent</div>
+            </div>
+        </div>
+        <div class="admin-stat-card {% if stats.pending_reports > 0 %}alert-card{% endif %}">
+            <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444, #fca5a5)">
+                <i class="bi bi-flag-fill"></i>
+            </div>
+            <div class="stat-body">
+                <div class="stat-value">{{ stats.pending_reports }}</div>
+                <div class="stat-label">Pending Reports</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="admin-grid">
+        <!-- Recent Users -->
+        <div class="admin-panel" data-aos="fade-up">
+            <div class="admin-panel-header">
+                <h3>Recent Signups</h3>
+                <a href="{{ url_for('admin.users') }}" class="admin-panel-link">View all →</a>
+            </div>
+            <div class="admin-table-wrap">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Status</th>
+                            <th>Joined</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in recent_users %}
+                        <tr>
+                            <td>
+                                <div class="admin-user-cell">
+                                    {% if user.profile_image %}
+                                    <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" class="admin-user-img">
+                                    {% else %}
+                                    <div class="admin-user-placeholder">{{ (user.full_name or user.username)[0] }}</div>
+                                    {% endif %}
+                                    {{ user.full_name or user.username }}
+                                </div>
+                            </td>
+                            <td class="admin-email">{{ user.email }}</td>
+                            <td>
+                                <span class="admin-badge {% if user.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                                    {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td class="admin-date">{{ user.created_at.strftime('%Y-%m-%d') if user.created_at else '' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Pending Reports -->
+        <div class="admin-panel" data-aos="fade-up" data-aos-delay="100">
+            <div class="admin-panel-header">
+                <h3>Pending Reports</h3>
+            </div>
+            {% if reports %}
+            {% for report in reports %}
+            <div class="report-item">
+                <div class="report-info">
+                    <strong>{{ report.reporter_name }}</strong> reported <strong>{{ report.reported_name }}</strong>
+                    <p class="report-reason">{{ report.reason }}</p>
+                </div>
+                <div class="report-actions">
+                    <form method="POST" action="{{ url_for('admin.resolve_report', report_id=report.id) }}" class="d-inline">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" value="dismiss">
+                        <button type="submit" class="admin-btn-sm btn-dismiss">Dismiss</button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.resolve_report', report_id=report.id) }}" class="d-inline">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="action" value="ban">
+                        <button type="submit" class="admin-btn-sm btn-ban">Ban User</button>
+                    </form>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="admin-empty">No pending reports. 🎉</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

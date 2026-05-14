@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block title %}Discover — Kindred{% endblock %}
+
+{% block content %}
+<div class="discover-container">
+    
+    <!-- Header -->
+    <div class="discover-header">
+        <div>
+            <h1 class="discover-title">Discover</h1>
+            <p class="discover-subtitle">People who might just feel familiar.</p>
+        </div>
+        <div class="likes-counter">
+            <div class="likes-icon {% if remaining_likes <= 5 %}low{% endif %}">
+                <i class="bi bi-heart{% if remaining_likes == 0 %}-fill{% endif %}"></i>
+            </div>
+            <div class="likes-info">
+                <span class="likes-num" id="likesCount">{{ remaining_likes }}</span>
+                <span class="likes-label">likes left today</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Profiles Grid -->
+    {% if profiles %}
+    <div class="profiles-grid" id="profilesGrid">
+        {% for item in profiles %}
+        <div class="profile-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 50 }}">
+            
+            <!-- Card Image -->
+            <div class="card-image-wrap">
+                {% if item.user.profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' + item.user.profile_image) }}" 
+                     class="card-profile-img" alt="{{ item.user.full_name }}">
+                {% elif item.preview_image %}
+                <img src="{{ url_for('static', filename='uploads/' + item.preview_image) }}" 
+                     class="card-profile-img" alt="{{ item.user.full_name }}">
+                {% else %}
+                <div class="card-img-placeholder">
+                    <span>{{ item.user.full_name[0] if item.user.full_name else '?' }}</span>
+                </div>
+                {% endif %}
+                <div class="card-image-overlay"></div>
+                
+                <!-- Like button -->
+                <button class="card-like-btn" data-user-id="{{ item.user.id }}" onclick="likeProfile({{ item.user.id }}, this)">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+            
+            <!-- Card Body -->
+            <div class="card-body-kindred">
+                <div class="card-name-row">
+                    <h3 class="card-name">{{ item.user.full_name }}{% if item.user.age %}, <span class="card-age">{{ item.user.age }}</span>{% endif %}</h3>
+                </div>
+                
+                {% if item.user.bio %}
+                <p class="card-bio">{{ item.user.bio[:120] }}{% if item.user.bio|length > 120 %}...{% endif %}</p>
+                {% endif %}
+                
+                <!-- Hobbies -->
+                {% if item.hobbies %}
+                <div class="card-tags">
+                    {% for hobby in item.hobbies[:3] %}
+                    <span class="card-tag">{{ hobby }}</span>
+                    {% endfor %}
+                    {% if item.hobbies|length > 3 %}
+                    <span class="card-tag-more">+{{ item.hobbies|length - 3 }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+                <!-- Music taste snippet -->
+                {% if item.user.music_taste %}
+                <div class="card-music">
+                    <i class="bi bi-music-note-beamed"></i>
+                    <span>{{ item.user.music_taste[:50] }}{% if item.user.music_taste|length > 50 %}...{% endif %}</span>
+                </div>
+                {% endif %}
+                
+                <a href="{{ url_for('profile.view_profile', user_id=item.user.id) }}" class="card-view-btn">
+                    View full profile
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <div class="empty-state" data-aos="fade-up">
+        <div class="empty-icon">✦</div>
+        <h2>You've seen everyone for now.</h2>
+        <p>New people join Kindred every day. Check back soon — or <a href="{{ url_for('profile.edit_profile') }}" class="auth-link">update your profile</a> to attract better matches.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Match Modal -->
+<div class="match-modal-overlay" id="matchModal">
+    <div class="match-modal">
+        <div class="match-modal-glow"></div>
+        <div class="match-icon">✦</div>
+        <h2>It's a match!</h2>
+        <p>You and this person both liked each other.</p>
+        <div class="match-actions">
+            <a href="#" class="btn-kindred-primary" id="matchChatBtn">Start a conversation →</a>
+            <button class="btn-kindred-ghost" onclick="closeMatchModal()">Keep exploring</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}{% endblock %}

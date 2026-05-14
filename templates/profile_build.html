@@ -1,0 +1,367 @@
+{% extends "base.html" %}
+{% block title %}Build Your Profile — Kindred{% endblock %}
+
+{% block content %}
+<div class="profile-build-container">
+    <!-- Progress Bar -->
+    <div class="build-progress" data-aos="fade-down">
+        <div class="progress-steps">
+            {% for i in range(1, 5) %}
+            <div class="progress-step {% if step|int >= i %}active{% endif %} {% if step|int > i %}done{% endif %}">
+                <div class="step-circle">
+                    {% if step|int > i %}
+                    <i class="bi bi-check2"></i>
+                    {% else %}
+                    {{ i }}
+                    {% endif %}
+                </div>
+                <span class="step-label">
+                    {% if i == 1 %}About You
+                    {% elif i == 2 %}Personality
+                    {% elif i == 3 %}Hobbies
+                    {% else %}Photos
+                    {% endif %}
+                </span>
+            </div>
+            {% if i < 4 %}
+            <div class="progress-line {% if step|int > i %}active{% endif %}"></div>
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="build-card" data-aos="fade-up">
+        
+        <!-- STEP 1: Basic Info -->
+        {% if step == '1' %}
+        <div class="build-step">
+            <div class="build-step-header">
+                <h2>Let's start with the basics.</h2>
+                <p>This is the foundation of who you are on Kindred.</p>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="build-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="1">
+                
+                <!-- Profile Image -->
+                <div class="profile-image-upload">
+                    <div class="image-preview-circle" id="imagePreview">
+                        {% if user.profile_image %}
+                        <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="Profile">
+                        {% else %}
+                        <div class="image-placeholder">
+                            <i class="bi bi-camera"></i>
+                            <span>Add photo</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <input type="file" name="profile_image" id="profileImageInput" 
+                           accept="image/*" class="d-none" onchange="previewImage(this)">
+                    <label for="profileImageInput" class="upload-label">
+                        <i class="bi bi-camera-fill"></i>
+                        {% if user.profile_image %}Change{% else %}Upload{% endif %} profile photo
+                    </label>
+                </div>
+                
+                <div class="form-row-2">
+                    <div class="form-group-kindred">
+                        <label class="kindred-label">Full name</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-person input-icon"></i>
+                            <input type="text" name="full_name" class="kindred-input" 
+                                   placeholder="Your real name" required
+                                   value="{{ user.full_name or '' }}">
+                        </div>
+                    </div>
+                    <div class="form-group-kindred">
+                        <label class="kindred-label">Age</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-calendar3 input-icon"></i>
+                            <input type="number" name="age" class="kindred-input" 
+                                   placeholder="Your age" min="18" max="99" required
+                                   value="{{ user.age or '' }}">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row-2">
+                    <div class="form-group-kindred">
+                        <label class="kindred-label">I identify as</label>
+                        <div class="select-wrapper">
+                            <i class="bi bi-gender-ambiguous input-icon"></i>
+                            <select name="gender" class="kindred-select" required>
+                                <option value="">Select...</option>
+                                {% for g in ['Man', 'Woman', 'Non-binary', 'Prefer not to say'] %}
+                                <option value="{{ g }}" {% if user.gender == g %}selected{% endif %}>{{ g }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group-kindred">
+                        <label class="kindred-label">Interested in</label>
+                        <div class="select-wrapper">
+                            <i class="bi bi-heart input-icon"></i>
+                            <select name="interested_in" class="kindred-select" required>
+                                <option value="">Select...</option>
+                                {% for g in ['Men', 'Women', 'Non-binary people', 'Everyone'] %}
+                                <option value="{{ g }}" {% if user.interested_in == g %}selected{% endif %}>{{ g }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group-kindred">
+                    <label class="kindred-label">Bio <span class="label-hint">— Tell your story in a few sentences</span></label>
+                    <textarea name="bio" class="kindred-textarea" rows="4" 
+                              placeholder="I'm someone who..." required
+                              maxlength="500">{{ user.bio or '' }}</textarea>
+                    <div class="char-count" id="bioCount">0 / 500</div>
+                </div>
+                
+                <div class="build-actions">
+                    <button type="submit" class="btn-kindred-primary">
+                        Continue <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- STEP 2: Personality -->
+        {% elif step == '2' %}
+        <div class="build-step">
+            <div class="build-step-header">
+                <h2>What shapes your world?</h2>
+                <p>Your taste is your identity. Share it honestly.</p>
+            </div>
+            
+            <form method="POST" class="build-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="2">
+                
+                <div class="form-group-kindred">
+                    <label class="kindred-label">
+                        <i class="bi bi-music-note-beamed"></i>
+                        Music that moves you
+                    </label>
+                    <textarea name="music_taste" class="kindred-textarea" rows="2"
+                              placeholder="Indie folk, jazz late at night, 70s classics, whatever speaks to your soul..."
+                              >{{ user.music_taste or '' }}</textarea>
+                </div>
+                
+                <div class="form-group-kindred">
+                    <label class="kindred-label">
+                        <i class="bi bi-camera-reels"></i>
+                        Films & shows you love
+                    </label>
+                    <textarea name="movie_taste" class="kindred-textarea" rows="2"
+                              placeholder="The kind of movies you watch twice, shows you quote at dinner..."
+                              >{{ user.movie_taste or '' }}</textarea>
+                </div>
+                
+                <div class="form-group-kindred">
+                    <label class="kindred-label">
+                        <i class="bi bi-star"></i>
+                        Artists & musicians you love
+                    </label>
+                    <input type="text" name="favorite_artists" class="kindred-input"
+                           placeholder="Phoebe Bridgers, Miles Davis, Radiohead..."
+                           value="{{ user.favorite_artists or '' }}">
+                </div>
+                
+                <div class="form-group-kindred">
+                    <label class="kindred-label">
+                        <i class="bi bi-film"></i>
+                        Favorite movies of all time
+                    </label>
+                    <input type="text" name="favorite_movies" class="kindred-input"
+                           placeholder="Before Sunrise, Eternal Sunshine, Spirited Away..."
+                           value="{{ user.favorite_movies or '' }}">
+                </div>
+                
+                <div class="build-actions">
+                    <a href="{{ url_for('profile.build_profile', step='1') }}" class="btn-kindred-ghost">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn-kindred-primary">
+                        Continue <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- STEP 3: Hobbies -->
+        {% elif step == '3' %}
+        <div class="build-step">
+            <div class="build-step-header">
+                <h2>What do you actually do?</h2>
+                <p>Pick at least 2 hobbies. You'll upload a photo for each one next.</p>
+            </div>
+            
+            <form method="POST" class="build-form" id="hobbiesForm">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="3">
+                
+                <div class="hobby-grid">
+                    {% set hobby_icons = {
+                        'Gym & Fitness': '💪',
+                        'Painting & Art': '🎨',
+                        'Guitar & Music': '🎸',
+                        'Cooking': '🍳',
+                        'Hiking': '🥾',
+                        'Photography': '📸',
+                        'Reading': '📚',
+                        'Travel': '✈️',
+                        'Dancing': '💃',
+                        'Yoga': '🧘',
+                        'Gaming': '🎮',
+                        'Cycling': '🚴',
+                        'Swimming': '🏊',
+                        'Writing': '✍️',
+                        'Gardening': '🌱',
+                        'Surfing': '🏄',
+                        'Climbing': '🧗',
+                        'Pottery': '🏺',
+                        'Film & Cinema': '🎬',
+                        'Volunteering': '🤝'
+                    } %}
+                    {% for hobby in hobbies %}
+                    <label class="hobby-card">
+                        <input type="checkbox" name="hobbies" value="{{ hobby }}" 
+                               class="hobby-checkbox d-none">
+                        <div class="hobby-card-inner">
+                            <span class="hobby-emoji">{{ hobby_icons.get(hobby, '⭐') }}</span>
+                            <span class="hobby-name">{{ hobby }}</span>
+                            <div class="hobby-check"><i class="bi bi-check2"></i></div>
+                        </div>
+                    </label>
+                    {% endfor %}
+                </div>
+                
+                <div class="hobby-selected-count">
+                    <span id="selectedCount">0</span> hobbies selected
+                    <span class="hobby-min-hint">(minimum 2)</span>
+                </div>
+                
+                <div class="build-actions">
+                    <a href="{{ url_for('profile.build_profile', step='2') }}" class="btn-kindred-ghost">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn-kindred-primary" id="hobbiesSubmit">
+                        Continue <span>→</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- STEP 4: Hobby Images -->
+        {% elif step == '4' %}
+        <div class="build-step">
+            <div class="build-step-header">
+                <h2>Show us, don't just tell us.</h2>
+                <p>Upload at least one photo of yourself doing each hobby. This is what makes Kindred real.</p>
+            </div>
+            
+            <form method="POST" enctype="multipart/form-data" class="build-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="step" value="4">
+                
+                <div class="hobby-uploads">
+                    {% for item in hobbies_with_images %}
+                    <div class="hobby-upload-item">
+                        <div class="hobby-upload-header">
+                            <span class="hobby-upload-name">{{ item.hobby.hobby_name }}</span>
+                            {% if item.image %}
+                            <span class="hobby-uploaded-badge"><i class="bi bi-check2-circle"></i> Uploaded</span>
+                            {% else %}
+                            <span class="hobby-required-badge"><i class="bi bi-exclamation-circle"></i> Required</span>
+                            {% endif %}
+                        </div>
+                        <div class="hobby-upload-area" onclick="document.getElementById('hi_{{ item.hobby.id }}').click()">
+                            {% if item.image %}
+                            <img src="{{ url_for('static', filename='uploads/' + item.image.image_path) }}" 
+                                 class="hobby-uploaded-img" id="preview_{{ item.hobby.id }}" alt="{{ item.hobby.hobby_name }}">
+                            {% else %}
+                            <div class="upload-placeholder" id="preview_{{ item.hobby.id }}">
+                                <i class="bi bi-cloud-arrow-up"></i>
+                                <span>Click to upload your {{ item.hobby.hobby_name.lower() }} photo</span>
+                                <small>JPG, PNG or WEBP — max 16MB</small>
+                            </div>
+                            {% endif %}
+                            <input type="file" name="hobby_image_{{ item.hobby.id }}" 
+                                   id="hi_{{ item.hobby.id }}" class="d-none" accept="image/*"
+                                   onchange="previewHobbyImage(this, 'preview_{{ item.hobby.id }}')">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="build-actions">
+                    <a href="{{ url_for('profile.build_profile', step='3') }}" class="btn-kindred-ghost">
+                        ← Back
+                    </a>
+                    <button type="submit" class="btn-kindred-primary">
+                        Complete my profile ✦
+                    </button>
+                </div>
+            </form>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Image preview
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function previewHobbyImage(input, previewId) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const el = document.getElementById(previewId);
+            el.innerHTML = `<img src="${e.target.result}" class="hobby-uploaded-img" alt="Preview">`;
+            el.classList.remove('upload-placeholder');
+            // Update badge
+            const item = input.closest('.hobby-upload-item');
+            const badge = item.querySelector('.hobby-required-badge');
+            if (badge) badge.innerHTML = '<i class="bi bi-check2-circle"></i> Ready';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Bio char count
+const bioEl = document.querySelector('textarea[name="bio"]');
+const bioCount = document.getElementById('bioCount');
+if (bioEl && bioCount) {
+    const update = () => bioCount.textContent = `${bioEl.value.length} / 500`;
+    update();
+    bioEl.addEventListener('input', update);
+}
+
+// Hobby selection
+const checkboxes = document.querySelectorAll('.hobby-checkbox');
+const countEl = document.getElementById('selectedCount');
+if (checkboxes.length) {
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', () => {
+            const selected = document.querySelectorAll('.hobby-checkbox:checked').length;
+            if (countEl) countEl.textContent = selected;
+            cb.closest('.hobby-card').classList.toggle('selected', cb.checked);
+        });
+    });
+}
+</script>
+{% endblock %}

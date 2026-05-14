@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kindred — Find people who feel familiar</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}">
+</head>
+<body class="landing-body">
+
+<!-- Ambient Background -->
+<div class="landing-ambient">
+    <div class="ambient-orb orb-a"></div>
+    <div class="ambient-orb orb-b"></div>
+    <div class="ambient-orb orb-c"></div>
+    <div class="ambient-orb orb-d"></div>
+</div>
+
+<!-- Landing Nav -->
+<nav class="landing-nav" id="landingNav">
+    <a href="#" class="landing-logo">
+        <span class="logo-icon">✦</span>
+        <span>Kindred</span>
+    </a>
+    <div class="landing-nav-links">
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#philosophy">Philosophy</a>
+    </div>
+    <div class="landing-nav-cta">
+        <a href="{{ url_for('auth.login') }}" class="btn-ghost">Sign In</a>
+        <a href="{{ url_for('auth.register') }}" class="btn-primary-glow">Join Kindred</a>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section" id="hero">
+    <div class="hero-content">
+        <div class="hero-eyebrow" data-aos="fade-up" data-aos-delay="100">
+            <span class="eyebrow-dot"></span>
+            A new kind of connection
+            <span class="eyebrow-dot"></span>
+        </div>
+        
+        <h1 class="hero-title" data-aos="fade-up" data-aos-delay="200">
+            Find people who<br>
+            <em>feel familiar.</em>
+        </h1>
+        
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="350">
+            Kindred is built for those who believe real connection<br>
+            starts with who you are, not how you look.
+        </p>
+        
+        <div class="hero-actions" data-aos="fade-up" data-aos-delay="450">
+            <a href="{{ url_for('auth.register') }}" class="hero-cta-main">
+                Begin your story
+                <span class="cta-arrow">→</span>
+            </a>
+            <a href="#about" class="hero-cta-ghost">
+                <i class="bi bi-play-circle"></i>
+                Learn more
+            </a>
+        </div>
+        
+        <div class="hero-stats" data-aos="fade-up" data-aos-delay="550">
+            <div class="stat">
+                <span class="stat-num">20</span>
+                <span class="stat-label">daily likes — quality over quantity</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-num">100%</span>
+                <span class="stat-label">personality-first profiles</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat">
+                <span class="stat-num">∞</span>
+                <span class="stat-label">authentic connections</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Profile Cards Preview -->
+    <div class="hero-cards" data-aos="fade-left" data-aos-delay="300">
+        <div class="preview-card card-main">
+            <div class="preview-card-img" style="background: linear-gradient(135deg, #a78bfa, #ec4899);">
+                <div class="preview-initials">S</div>
+            </div>
+            <div class="preview-card-body">
+                <div class="preview-name">Sophia, 26</div>
+                <div class="preview-bio">Film director, jazz lover & avid reader</div>
+                <div class="preview-tags">
+                    <span class="ptag">🎬 Cinema</span>
+                    <span class="ptag">🎷 Jazz</span>
+                    <span class="ptag">📚 Books</span>
+                </div>
+            </div>
+        </div>
+        <div class="preview-card card-secondary">
+            <div class="preview-card-img" style="background: linear-gradient(135deg, #6ee7b7, #3b82f6);">
+                <div class="preview-initials">M</div>
+            </div>
+            <div class="preview-card-body">
+                <div class="preview-name">Marcus, 29</div>
+                <div class="preview-bio">Architect by day, guitarist by night</div>
+                <div class="preview-tags">
+                    <span class="ptag">🎸 Guitar</span>
+                    <span class="ptag">✏️ Design</span>
+                </div>
+            </div>
+        </div>
+        <div class="preview-card card-third">
+            <div class="preview-card-img" style="background: linear-gradient(135deg, #fbbf24, #f87171);">
+                <div class="preview-initials">L</div>
+            </div>
+            <div class="preview-card-body">
+                <div class="preview-name">Luna, 24</div>
+                <div class="preview-bio">Painter, traveler, and plant parent</div>
+                <div class="preview-tags">
+                    <span class="ptag">🎨 Art</span>
+                    <span class="ptag">✈️ Travel</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section" id="about">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-eyebrow">Our story</div>
+            <h2 class="section-title">Dating, reimagined.</h2>
+            <p class="section-desc">
+                We built Kindred because we were tired of apps that reduce people to photos and split-second judgments.
+                Real connection takes time, honesty, and personality.
+            </p>
+        </div>
+        
+        <div class="about-grid">
+            <div class="about-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="about-icon">
+                    <i class="bi bi-person-heart"></i>
+                </div>
+                <h3>Personality First</h3>
+                <p>Every profile tells a real story — your music, your films, your hobbies, your passions. No hollow bios.</p>
+            </div>
+            <div class="about-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="about-icon">
+                    <i class="bi bi-shield-heart"></i>
+                </div>
+                <h3>Safety Centered</h3>
+                <p>Human moderation, verified hobby photos, and a reporting system that actually works. Your comfort is everything.</p>
+            </div>
+            <div class="about-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="about-icon">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <h3>Intentional Pacing</h3>
+                <p>Twenty likes a day. That's it. Because when everything is a swipe, nothing matters. We want each like to mean something.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section" id="features">
+    <div class="container">
+        <div class="section-header" data-aos="fade-up">
+            <div class="section-eyebrow">What makes us different</div>
+            <h2 class="section-title">Built with intention.</h2>
+        </div>
+        
+        <div class="features-list">
+            <div class="feature-row" data-aos="fade-right">
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <div class="fm-hobby-grid">
+                            <div class="fm-hobby-card" style="background: linear-gradient(135deg,#7c3aed,#db2777)">🎸</div>
+                            <div class="fm-hobby-card" style="background: linear-gradient(135deg,#0891b2,#7c3aed)">📸</div>
+                            <div class="fm-hobby-card" style="background: linear-gradient(135deg,#059669,#0891b2)">🧗</div>
+                            <div class="fm-hobby-card" style="background: linear-gradient(135deg,#d97706,#dc2626)">🎨</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-num">01</div>
+                    <h3>Show your passions, literally</h3>
+                    <p>When you add a hobby to your profile, you upload a real photo of yourself doing it. 
+                    That guitar picture. That hiking trail selfie. Because authenticity shows.</p>
+                </div>
+            </div>
+            
+            <div class="feature-row reverse" data-aos="fade-left">
+                <div class="feature-text">
+                    <div class="feature-num">02</div>
+                    <h3>20 likes. Make them count.</h3>
+                    <p>You get 20 likes a day. Not unlimited swipes, not gamified loops — 
+                    just 20 thoughtful opportunities to say "I'd like to know you."</p>
+                </div>
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <div class="fm-likes">
+                            <div class="fm-likes-label">Likes remaining today</div>
+                            <div class="fm-likes-count">17</div>
+                            <div class="fm-likes-dots">
+                                {% for i in range(20) %}
+                                <div class="fm-dot {% if i < 17 %}filled{% endif %}"></div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="feature-row" data-aos="fade-right">
+                <div class="feature-visual">
+                    <div class="feature-mockup">
+                        <div class="fm-match">
+                            <div class="fm-match-text">It's a match ✦</div>
+                            <div class="fm-match-avatars">
+                                <div class="fm-avatar" style="background: linear-gradient(135deg,#a78bfa,#ec4899)">S</div>
+                                <div class="fm-heart">♥</div>
+                                <div class="fm-avatar" style="background: linear-gradient(135deg,#6ee7b7,#3b82f6)">M</div>
+                            </div>
+                            <div class="fm-match-sub">Start a conversation</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="feature-text">
+                    <div class="feature-num">03</div>
+                    <h3>Matches that mean something</h3>
+                    <p>When two people both like each other, something real opens up. 
+                    A quiet conversation space, a compatibility snapshot, a beginning.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Philosophy Section -->
+<section class="philosophy-section" id="philosophy">
+    <div class="philosophy-inner">
+        <div class="philosophy-quote" data-aos="fade-up">
+            <span class="quote-mark">"</span>
+            We didn't build another way to collect matches.<br>
+            We built a place to find someone who <em>gets it</em>.
+            <span class="quote-mark">"</span>
+        </div>
+        
+        <div class="philosophy-pillars" data-aos="fade-up" data-aos-delay="200">
+            <div class="pillar">
+                <i class="bi bi-eye-slash"></i>
+                <span>No anonymous browsing</span>
+            </div>
+            <div class="pillar">
+                <i class="bi bi-camera"></i>
+                <span>Verified hobby photos</span>
+            </div>
+            <div class="pillar">
+                <i class="bi bi-heart-pulse"></i>
+                <span>Mutual match only</span>
+            </div>
+            <div class="pillar">
+                <i class="bi bi-person-check"></i>
+                <span>Human moderation</span>
+            </div>
+        </div>
+        
+        <a href="{{ url_for('auth.register') }}" class="philosophy-cta" data-aos="fade-up" data-aos-delay="350">
+            Begin your story on Kindred →
+        </a>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer class="landing-footer">
+    <div class="footer-logo">
+        <span class="logo-icon">✦</span>
+        Kindred
+    </div>
+    <p class="footer-tagline">For people who believe real connection still exists.</p>
+    <div class="footer-links">
+        <a href="#">About</a>
+        <a href="#">Safety</a>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+    </div>
+    <p class="footer-copy">© 2024 Kindred. Made with care.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/landing.js') }}"></script>
+</body>
+</html>

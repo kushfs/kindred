@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Sign In — Kindred{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" data-aos="fade-up">
+        <div class="auth-header">
+            <a href="{{ url_for('auth.index') }}" class="auth-logo">
+                <span class="logo-icon">✦</span> Kindred
+            </a>
+            <h1 class="auth-title">Welcome back.</h1>
+            <p class="auth-subtitle">Your story continues here.</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('auth.login') }}" class="auth-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group-kindred">
+                <label class="kindred-label">Email address</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-envelope input-icon"></i>
+                    <input type="email" name="email" class="kindred-input" 
+                           placeholder="your@email.com" required
+                           value="{{ request.form.get('email', '') }}">
+                </div>
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label">Password</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-lock input-icon"></i>
+                    <input type="password" name="password" class="kindred-input" 
+                           placeholder="Your password" required id="passwordInput">
+                    <button type="button" class="input-toggle" onclick="togglePassword('passwordInput', this)">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn-kindred-primary">
+                Sign in to Kindred
+                <span>→</span>
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>New to Kindred? <a href="{{ url_for('auth.register') }}" class="auth-link">Create your profile</a></p>
+        </div>
+    </div>
+    
+    <!-- Decorative side text -->
+    <div class="auth-aside" data-aos="fade-right" data-aos-delay="200">
+        <div class="aside-quote">
+            <em>"The right person is looking for you too."</em>
+        </div>
+        <div class="aside-features">
+            <div class="aside-feature">
+                <i class="bi bi-check2-circle"></i>
+                Personality-first matching
+            </div>
+            <div class="aside-feature">
+                <i class="bi bi-check2-circle"></i>
+                20 daily likes — intentional
+            </div>
+            <div class="aside-feature">
+                <i class="bi bi-check2-circle"></i>
+                Safe and moderated space
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
+{% endblock %}

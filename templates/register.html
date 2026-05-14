@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Join Kindred — Create your profile{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card register-card" data-aos="fade-up">
+        <div class="auth-header">
+            <a href="{{ url_for('auth.index') }}" class="auth-logo">
+                <span class="logo-icon">✦</span> Kindred
+            </a>
+            <h1 class="auth-title">Begin your story.</h1>
+            <p class="auth-subtitle">It takes a few minutes. It might change everything.</p>
+        </div>
+        
+        <form method="POST" action="{{ url_for('auth.register') }}" class="auth-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <div class="form-group-kindred">
+                <label class="kindred-label">Choose a username</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-at input-icon"></i>
+                    <input type="text" name="username" class="kindred-input" 
+                           placeholder="yourusername" required
+                           value="{{ request.form.get('username', '') }}">
+                </div>
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label">Email address</label>
+                <div class="input-wrapper">
+                    <i class="bi bi-envelope input-icon"></i>
+                    <input type="email" name="email" class="kindred-input" 
+                           placeholder="your@email.com" required
+                           value="{{ request.form.get('email', '') }}">
+                </div>
+            </div>
+            
+            <div class="form-row-2">
+                <div class="form-group-kindred">
+                    <label class="kindred-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-lock input-icon"></i>
+                        <input type="password" name="password" class="kindred-input" 
+                               placeholder="Min. 8 characters" required id="pw1">
+                        <button type="button" class="input-toggle" onclick="togglePassword('pw1', this)">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group-kindred">
+                    <label class="kindred-label">Confirm password</label>
+                    <div class="input-wrapper">
+                        <i class="bi bi-lock-fill input-icon"></i>
+                        <input type="password" name="confirm_password" class="kindred-input" 
+                               placeholder="Repeat password" required id="pw2">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="terms-row">
+                <label class="kindred-checkbox">
+                    <input type="checkbox" required>
+                    <span class="checkmark"></span>
+                    I agree to the <a href="#" class="auth-link">Terms of Service</a> and 
+                    <a href="#" class="auth-link">Privacy Policy</a>
+                </label>
+            </div>
+            
+            <button type="submit" class="btn-kindred-primary">
+                Create my Kindred profile
+                <span>→</span>
+            </button>
+        </form>
+        
+        <div class="auth-footer">
+            <p>Already have an account? <a href="{{ url_for('auth.login') }}" class="auth-link">Sign in</a></p>
+        </div>
+    </div>
+    
+    <div class="auth-aside" data-aos="fade-right" data-aos-delay="200">
+        <div class="aside-quote">
+            <em>"Your personality is your most attractive feature."</em>
+        </div>
+        <div class="aside-steps">
+            <div class="aside-step">
+                <span class="step-num">1</span>
+                <div>
+                    <strong>Create your account</strong>
+                    <p>Quick and secure signup</p>
+                </div>
+            </div>
+            <div class="aside-step">
+                <span class="step-num">2</span>
+                <div>
+                    <strong>Build your profile</strong>
+                    <p>Share your passions and personality</p>
+                </div>
+            </div>
+            <div class="aside-step">
+                <span class="step-num">3</span>
+                <div>
+                    <strong>Discover kindred souls</strong>
+                    <p>Meet people who feel familiar</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(id, btn) {
+    const input = document.getElementById(id);
+    const icon = btn.querySelector('i');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+    } else {
+        input.type = 'password';
+        icon.className = 'bi bi-eye';
+    }
+}
+</script>
+{% endblock %}

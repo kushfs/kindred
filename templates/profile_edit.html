@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — Kindred{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" data-aos="fade-up" style="max-width: 680px;">
+        <div class="auth-header">
+            <h1 class="auth-title">Edit your profile.</h1>
+            <p class="auth-subtitle">Keep your story authentic.</p>
+        </div>
+        
+        <form method="POST" enctype="multipart/form-data" class="auth-form">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
+            <!-- Profile Image -->
+            <div class="profile-image-upload">
+                <div class="image-preview-circle" id="imagePreview">
+                    {% if user.profile_image %}
+                    <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" alt="Profile">
+                    {% else %}
+                    <div class="image-placeholder">
+                        <i class="bi bi-camera"></i>
+                        <span>Add photo</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <input type="file" name="profile_image" id="profileImageInput" accept="image/*" class="d-none" onchange="previewImage(this)">
+                <label for="profileImageInput" class="upload-label">
+                    <i class="bi bi-camera-fill"></i>
+                    Change profile photo
+                </label>
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label">Bio</label>
+                <textarea name="bio" class="kindred-textarea" rows="4" maxlength="500">{{ user.bio or '' }}</textarea>
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label"><i class="bi bi-music-note-beamed"></i> Music taste</label>
+                <textarea name="music_taste" class="kindred-textarea" rows="2">{{ user.music_taste or '' }}</textarea>
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label"><i class="bi bi-camera-reels"></i> Film & TV taste</label>
+                <textarea name="movie_taste" class="kindred-textarea" rows="2">{{ user.movie_taste or '' }}</textarea>
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label"><i class="bi bi-star"></i> Favorite artists</label>
+                <input type="text" name="favorite_artists" class="kindred-input" value="{{ user.favorite_artists or '' }}">
+            </div>
+            
+            <div class="form-group-kindred">
+                <label class="kindred-label"><i class="bi bi-film"></i> Favorite movies</label>
+                <input type="text" name="favorite_movies" class="kindred-input" value="{{ user.favorite_movies or '' }}">
+            </div>
+            
+            <div class="build-actions">
+                <a href="{{ url_for('profile.my_profile') }}" class="btn-kindred-ghost">Cancel</a>
+                <button type="submit" class="btn-kindred-primary">Save changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            document.getElementById('imagePreview').innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}

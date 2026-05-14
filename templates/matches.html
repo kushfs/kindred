@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Your Matches — Kindred{% endblock %}
+
+{% block content %}
+<div class="matches-container">
+    <div class="matches-header">
+        <h1>Your Matches</h1>
+        <p>People who liked you back. Every match is mutual.</p>
+    </div>
+    
+    {% if matches %}
+    <div class="matches-grid">
+        {% for item in matches %}
+        <div class="match-card" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 80 }}">
+            <div class="match-card-img-wrap">
+                {% if item.match.profile_image %}
+                <img src="{{ url_for('static', filename='uploads/' + item.match.profile_image) }}" 
+                     alt="{{ item.match.full_name }}" class="match-card-img">
+                {% else %}
+                <div class="match-card-placeholder">{{ item.match.full_name[0] if item.match.full_name else '?' }}</div>
+                {% endif %}
+                {% if item.match.unread_count %}
+                <span class="match-unread-badge">{{ item.match.unread_count }}</span>
+                {% endif %}
+            </div>
+            
+            <div class="match-card-info">
+                <h3 class="match-name">{{ item.match.full_name }}{% if item.match.age %}, {{ item.match.age }}{% endif %}</h3>
+                
+                {% if item.hobbies %}
+                <div class="match-hobbies">
+                    {% for h in item.hobbies %}
+                    <span class="match-hobby-tag">{{ h }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                {% if item.match.last_message %}
+                <p class="match-last-msg">
+                    <i class="bi bi-chat-quote"></i>
+                    {{ item.match.last_message[:60] }}{% if item.match.last_message|length > 60 %}...{% endif %}
+                </p>
+                {% else %}
+                <p class="match-no-msg">No messages yet — be the first!</p>
+                {% endif %}
+                
+                <div class="match-card-actions">
+                    <a href="{{ url_for('chat.chat', match_id=item.match.match_id) }}" class="btn-match-chat">
+                        <i class="bi bi-chat-heart"></i>
+                        {% if item.match.last_message %}Continue{% else %}Say hello{% endif %}
+                    </a>
+                    <a href="{{ url_for('profile.view_profile', user_id=item.match.id) }}" class="btn-match-profile">
+                        <i class="bi bi-person"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    {% else %}
+    <div class="empty-state" data-aos="fade-up">
+        <div class="empty-icon">♥</div>
+        <h2>No matches yet.</h2>
+        <p>Keep exploring and liking profiles you genuinely connect with.</p>
+        <a href="{{ url_for('discover.discover') }}" class="btn-kindred-primary mt-3">
+            Start discovering →
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
